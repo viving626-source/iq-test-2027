@@ -293,8 +293,8 @@ var PAY={price:9.9,currency:"MOP",methods:[
 
 /* ============ Supabase：旧项目（记录测评结果） ============ */
 var SUP_OLD={url:"https://qczgmhtfxswgcnoncqja.supabase.co",key:"sb_publishable_RQ-ETJViWOolwRybH6pKXg_81bPbKpD"};
-/* ============ Supabase：新项目（付费订单 / 解锁）—— 待用户提供 URL 与 anon key ============ */
-var SUP_NEW={url:"",key:""};
+/* ============ Supabase：新项目（付费订单 / 解锁）—— 复用已有订单系统 ============ */
+var SUP_NEW={url:"https://qczgmhtfxswgcnoncqja.supabase.co",key:"sb_publishable_RQ-ETJViWOolwRybH6pKXg_81bPbKpD"};
 function sbHeaders(sup){return {"apikey":sup.key,"Authorization":"Bearer "+sup.key,"Content-Type":"application/json","Prefer":"return=minimal"};}
 </script>
 <script>
