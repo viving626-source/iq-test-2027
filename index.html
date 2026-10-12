@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>IQ 2027 · 世界通用智力测评</title>
+<meta name="description" content="2027 全球版智力测评，覆盖图形推理、数字、语言、空间与逻辑五大维度，依据经典智力测量范式构建。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2318263f'/%3E%3Ctext x='32' y='42' font-size='30' text-anchor='middle' fill='%23e8c56a' font-family='Georgia' font-weight='700'%3EIQ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --ink:#18263f;         /* 墨蓝 */
+  --ink-2:#223355;
+  --paper:#f4f6f9;       /* 冷白 */
+  --card:#ffffff;
+  --line:#dde3ec;
+  --gold:#c9a227;        /* 金属金 */
+  --gold-soft:#e8c56a;
+  --teal:#2c7a7b;
+  --red:#b23a3a;
+  --text:#26313f;
+  --muted:#6b7686;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"Noto Sans SC",-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--paper);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.serif{font-family:"Noto Serif SC",Georgia,"Songti SC",serif}
+
+/* ===== 视图控制 ===== */
+.view{display:none}
+.view.active{display:block}
+
+/* ===== Hero ===== */
+.hero{background:radial-gradient(120% 90% at 50% 0%,var(--ink-2) 0%,var(--ink) 55%,#0f1a2e 100%);color:#fff;padding:72px 22px 64px;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(420px 260px at 85% 20%,rgba(232,197,106,.14),transparent 70%),radial-gradient(360px 240px at 12% 30%,rgba(44,122,123,.18),transparent 70%);pointer-events:none}
+.hero .badge{display:inline-block;border:1px solid rgba(232,197,106,.5);color:var(--gold-soft);font-size:12px;letter-spacing:.32em;padding:6px 16px;border-radius:999px;margin-bottom:22px;text-transform:uppercase}
+.hero h1{font-size:clamp(38px,7vw,64px);font-weight:700;letter-spacing:.02em;margin-bottom:14px;line-height:1.15}
+.hero .sub{font-size:clamp(15px,2.4vw,19px);color:#cdd6e3;max-width:640px;margin:0 auto 8px;font-weight:300}
+.hero .meta{margin-top:26px;display:flex;gap:34px;justify-content:center;flex-wrap:wrap;color:#9fb0c6;font-size:13px}
+.hero .meta b{display:block;color:#fff;font-size:22px;font-weight:600;font-family:"Noto Serif SC",serif}
+.hero .meta span{font-size:12px;color:#7f90a8}
+.btn{display:inline-block;background:var(--gold);color:#2a2410;font-weight:700;padding:15px 34px;border-radius:10px;font-size:16px;transition:transform .15s,box-shadow .2s;box-shadow:0 6px 20px rgba(201,162,39,.35)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(201,162,39,.45)}
+.btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none;font-weight:500}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn-block{display:block;width:100%}
+.hero .cta{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero .note{margin-top:18px;font-size:12px;color:#7f90a8}
+
+/* ===== 卡片 & 说明 ===== */
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 30px;box-shadow:0 10px 30px rgba(24,38,63,.06)}
+.lead{max-width:760px;margin:40px auto;padding:0 20px}
+.lead h2{font-size:clamp(22px,4vw,30px);color:var(--ink);font-weight:700;margin-bottom:14px;text-align:center}
+.lead p{color:var(--muted);text-align:center;margin-bottom:26px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.grid .tile{border:1px solid var(--line);border-radius:12px;padding:18px 14px;text-align:center;background:#fbfcfd}
+.grid .tile b{display:block;font-size:26px;color:var(--ink);font-family:"Noto Serif SC",serif;margin-bottom:4px}
+.grid .tile span{font-size:12.5px;color:var(--muted)}
+.terms{margin:34px 0 40px;background:#eef1f6;border-radius:12px;padding:20px 22px;font-size:13.5px;color:#53627a}
+.terms b{color:var(--ink)}
+
+/* ===== 测试视图 ===== */
+.quiz-top{max-width:720px;margin:34px auto 0;padding:0 20px;text-align:center}
+.quiz-top .dim{font-size:12.5px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;font-weight:600}
+.quiz-top .num{font-size:13px;color:var(--muted);margin:6px 0 14px}
+.progress{height:6px;background:#e3e8f0;border-radius:999px;overflow:hidden;margin:0 auto 8px;max-width:640px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--gold));border-radius:999px;transition:width .4s}
+.progress-label{font-size:12px;color:var(--muted)}
+.quiz-card{max-width:720px;margin:18px auto 40px;padding:0 20px}
+.q-title{font-size:clamp(18px,3.4vw,24px);color:var(--ink);font-weight:600;margin-bottom:6px;font-family:"Noto Serif SC",serif}
+.q-extra{font-size:13.5px;color:var(--muted);margin-bottom:18px}
+.q-stage{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;display:flex;justify-content:center}
+.stage{background:#fbfcfd;border-radius:10px;padding:10px;display:inline-grid;gap:6px}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.opt{border:1.5px solid var(--line);border-radius:14px;background:var(--card);padding:14px;text-align:center;transition:border-color .15s,transform .1s,background .15s}
+.opt:hover{border-color:var(--gold)}
+.opt.sel{border-color:var(--gold);background:#fdf9ec;transform:translateY(-1px)}
+.opt.ok{border-color:var(--teal);background:#f0f7f7}
+.opt.bad{border-color:var(--red);background:#fdf0f0}
+.opt .otxt{font-size:16px;font-weight:600;color:var(--ink)}
+.opt .odesc{font-size:12.5px;color:var(--muted);margin-top:4px}
+.actions{max-width:720px;margin:0 auto 60px;padding:0 20px;display:flex;gap:12px;justify-content:space-between;align-items:center}
+#btnNext{background:var(--ink);color:#fff;padding:13px 26px;border-radius:10px;font-weight:600;font-size:15px}
+#btnNext:hover{background:var(--ink-2)}
+#btnNext[disabled]{opacity:.45;cursor:not-allowed}
+#btnPrev{color:var(--muted);padding:13px 10px;font-size:14px}
+#btnPrev:hover{color:var(--ink)}
+
+/* ===== 结果视图 ===== */
+.result{max-width:760px;margin:34px auto 60px;padding:0 20px}
+.r-head{background:linear-gradient(135deg,var(--ink-2),var(--ink));color:#fff;border-radius:20px;padding:34px 30px;text-align:center;position:relative;overflow:hidden}
+.r-head::after{content:"";position:absolute;inset:0;background:radial-gradient(300px 180px at 80% 10%,rgba(232,197,106,.2),transparent 65%);pointer-events:none}
+.r-head .tag{font-size:12px;letter-spacing:.3em;color:var(--gold-soft);text-transform:uppercase}
+.r-head h2{font-size:clamp(22px,4.4vw,32px);margin:10px 0 4px;font-family:"Noto Serif SC",serif}
+.r-head .iqline{font-size:15px;color:#cdd6e3}
+.r-iq{display:flex;gap:26px;justify-content:center;align-items:center;margin:24px 0 0;flex-wrap:wrap}
+.r-iq .iq-big{font-size:clamp(52px,11vw,78px);font-weight:700;color:#fff;line-height:1;font-family:"Noto Serif SC",serif}
+.r-iq .iq-band{text-align:left}
+.r-iq .iq-band b{display:block;font-size:19px;color:var(--gold-soft)}
+.r-iq .iq-band span{font-size:12.5px;color:#9fb0c6}
+.r-share{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.r-share .btn{font-size:14px;padding:12px 22px}
+.r-share .btn-ghost{color:#fff;border-color:rgba(255,255,255,.4)}
+.r-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 28px;margin-top:16px}
+.r-block h3{font-size:17px;color:var(--ink);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.r-block h3 .ico{width:26px;height:26px;border-radius:8px;background:var(--ink);color:var(--gold-soft);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.r-block p{font-size:14.5px;color:#44546a}
+.r-block p + p{margin-top:10px}
+.r-dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:6px}
+.r-dim{border:1px solid var(--line);border-radius:12px;padding:14px 12px;text-align:center}
+.r-dim b{display:block;font-size:15px;color:var(--ink);margin-bottom:6px}
+.r-dim .bar{height:6px;background:#e6eaf1;border-radius:999px;overflow:hidden;margin:0 auto 8px}
+.r-dim .bar i{display:block;height:100%;background:var(--gold);border-radius:999px}
+.r-dim span{font-size:12px;color:var(--muted)}
+.bullets{margin:8px 0 0 0;padding-left:0;list-style:none}
+.bullets li{font-size:14.5px;color:#44546a;padding:7px 0 7px 26px;position:relative;border-bottom:1px dashed var(--line)}
+.bullets li:last-child{border-bottom:none}
+.bullets li::before{content:"◆";position:absolute;left:2px;color:var(--gold);font-size:11px;top:9px}
+.tagline{font-size:16px;color:var(--ink);font-style:italic;text-align:center;margin:18px 0 6px}
+.cite{font-size:11.5px;color:#9aa4b3;margin-top:14px;line-height:1.6}
+.cite b{color:var(--muted)}
+.result .actions{margin-top:22px}
+.retake{text-align:center;margin-top:22px}
+
+/* ===== 模态 ===== */
+.modal-mask{position:fixed;inset:0;background:rgba(15,26,46,.62);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;backdrop-filter:blur(3px)}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:18px;max-width:520px;width:100%;padding:28px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:88vh;overflow:auto}
+.modal h3{font-size:19px;color:var(--ink);font-weight:700;margin-bottom:6px}
+.modal .m-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.modal .field{margin:12px 0}
+.modal label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.modal input[type=password]{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
+.modal input:focus{outline:none;border-color:var(--gold)}
+.modal .btn{margin-top:14px}
+.modal .m-close{float:right;font-size:22px;color:var(--muted);line-height:1}
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== 响应式 ===== */
+@media (max-width:560px){
+  .opts{grid-template-columns:1fr}
+  .panel{padding:22px 18px}
+  .r-block{padding:22px 18px}
+  .r-head{padding:28px 18px}
+  .hero{padding:56px 18px 52px}
+  .stage{transform-origin:top center}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+
+<!-- ===== 视图：首页 ===== -->
+<section id="view-intro" class="view active">
+  <header class="hero">
+    <div class="badge">2027 · Global Intelligence</div>
+    <h1 class="serif">IQ 2027</h1>
+    <p class="sub">世界通用智力测评 · 最新版</p>
+    <p class="sub">覆盖图形推理、数字、语言、空间与逻辑五大维度</p>
+    <div class="meta">
+      <div><b>42</b><span>测评题目</span></div>
+      <div><b>5</b><span>认知维度</span></div>
+      <div><b>≈25′</b><span>建议用时</span></div>
+      <div><b>100±15</b><span>常模基线</span></div>
+    </div>
+    <div class="cta">
+      <button class="btn" onclick="startQuiz()">开始测评</button>
+      <button class="btn btn-ghost" onclick="showModal('modal-how')">了解测评</button>
+    </div>
+    <p class="note">本测评为智力测评工具，非医疗诊断，结果仅供自我认知参考。</p>
+  </header>
+
+  <div class="lead">
+    <h2>为什么测智力，仍然值得认真对待</h2>
+    <p>智力不是一个单一数字。它由流体推理、空间构型、语言组织与工作记忆等相互独立又彼此协作的能力构成。本测试依据经典智力测量范式设计，评估你在多个维度上的综合表现。</p>
+    <div class="grid">
+      <div class="tile"><b>G</b><span>一般认知能力<br>g 因素</span></div>
+      <div class="tile"><b>F</b><span>流体智力<br>Fluid</span></div>
+      <div class="tile"><b>C</b><span>晶体智力<br>Crystallized</span></div>
+      <div class="tile"><b>S</b><span>空间能力<br>Spatial</span></div>
+    </div>
+    <div class="terms">
+      <b>测评说明</b> · 共 42 题，覆盖五大维度，难度逐级递进。每题选择一个最合理的答案，作答后不可修改上一题。中途可离开，进度会自动保存。结果页将给出认知画像、维度分析和理论解读。
+    </div>
+  </div>
+</section>
+
+<!-- ===== 视图：测试 ===== -->
+<section id="view-quiz" class="view">
+  <div class="quiz-top">
+    <div class="dim" id="quizDim"></div>
+    <div class="num" id="quizNum"></div>
+    <div class="progress"><i id="progressBar" style="width:0%"></i></div>
+    <div class="progress-label" id="progressLabel"></div>
+  </div>
+  <div class="quiz-card">
+    <div class="q-title" id="qTitle"></div>
+    <div class="q-extra" id="qExtra"></div>
+    <div class="q-stage" id="qStage"></div>
+    <div class="opts" id="qOpts"></div>
+  </div>
+  <div class="actions">
+    <button id="btnPrev" onclick="prevQ()">← 上一题</button>
+    <button id="btnNext" disabled onclick="nextQ()">下一题 →</button>
+  </div>
+</section>
+
+<!-- ===== 视图：结果 ===== -->
+<section id="view-result" class="view">
+  <div class="result" id="resultRoot"></div>
+</section>
+
+<!-- ===== 模态：了解测评 ===== -->
+<div class="modal-mask" id="modal-how">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal('modal-how')">×</button>
+    <h3>测评说明</h3>
+    <p class="m-sub">本测试如何设计、如何计分</p>
+    <p style="font-size:14px;color:#44546a;line-height:1.75">
+      题目依据经典智力测量范式构建，涵盖五个维度：<b>图形推理</b>（瑞文式渐进矩阵）、<b>数字推理</b>（数列与运算规律）、<b>语言逻辑</b>（类比与语义）、<b>空间能力</b>（旋转、展开与镜像）与<b>抽象逻辑</b>（情境与三段论）。<br><br>
+      计分基于正态分布常模（均值 100、标准差 15），按正确题数折算标准分。结果仅为测评参考，不构成任何诊断或评价。
+    </p>
+    <button class="btn btn-block" onclick="startQuiz();closeModal('modal-how')">开始测评</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 常量与状态 ============ */
+var DIMS=["A","B","C","D","E"];
+var DIM_NAME={A:"图形推理",B:"数字推理",C:"语言逻辑",D:"空间能力",E:"抽象逻辑"};
+var CUR=0, ANSWERS=[];
+var KEY_SAVE="iq2027_answers";
+
+var PAY={price:9.9,currency:"MOP/HKD"};
+</script>
+<script>
+/* ============ SVG 图形渲染 ============ */
+/* shape: {t:'c'|'s'|'r'|'t'|'d'|'p', c:color, n:count, r:rot} */
+function cellSVG(shapes, size){
+  var S=size||52, mid=S/2;
+  var svg='<svg width="'+S+'" height="'+S+'" viewBox="0 0 '+S+' '+S+'" shape-rendering="geometricPrecision" style="display:block">';
+  shapes.forEach(function(sh){
+    var count=sh.n||1, cols=count>=3?3:count, rows=count>=3?Math.ceil(count/3):1;
+    var stepX=S/(cols+1), stepY=S/(rows+1);
+    for(var k=0;k<count;k++){
+      var col=k%cols, row=Math.floor(k/cols);
+      var cx=stepX*(col+1), cy=stepY*(row+1);
+      var r0=Math.max(2,(S/2-6)*(sh.size||.4));
+      var g=drawShape(sh.t, cx, cy, r0, sh.c, sh.r||0);
+      svg+=g;
+    }
+  });
+  svg+='</svg>';
+  return svg;
+}
+function drawShape(t,cx,cy,r,color,rot){
+  var c=color||"#243b53";
+  var rotT=rot?( ' transform="rotate('+rot+' '+cx+' '+cy+')"'):'';
+  if(t==='c'){return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+c+'"'+rotT+'/>';}
+  if(t==='s'){return '<rect x="'+(cx-r)+'" y="'+(cy-r)+'" width="'+(2*r)+'" height="'+(2*r)+'" fill="'+c+'"'+rotT+'/>';}
+  if(t==='r'){return '<rect x="'+(cx-r*1.35)+'" y="'+(cy-r*0.75)+'" width="'+(r*2.7)+'" height="'+(r*1.5)+'" fill="'+c+'"'+rotT+'/>';}
+  if(t==='t'){return '<polygon points="'+cx+','+(cy-r)+' '+(cx-r)+','+(cy+r)+' '+(cx+r)+','+(cy+r)+'" fill="'+c+'"'+rotT+'/>';}
+  if(t==='d'){return '<polygon points="'+cx+','+(cy-r)+' '+(cx+r)+','+cy+' '+cx+','+(cy+r)+' '+(cx-r)+','+cy+'" fill="'+c+'"'+rotT+'/>';}
+  if(t==='p'){return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+c+'" stroke-width="3"'+rotT+'/>';}
+  return '';
+}
+function stageSVG(cells, cell){
+  var sz=cell||46, n=Math.round(Math.sqrt(cells.length));
+  var svg='<div class="stage" style="grid-template-columns:repeat('+n+',auto)">';
+  cells.forEach(function(sh){
+    svg+='<div style="padding:3px">'+(sh?cellSVG(sh,sz):'<div style="width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:#b9c3d2;font-weight:600">?</div>')+'</div>';
+  });
+  svg+='</div>';
+  return svg;
+}
+</script>
+<script>
+/* ============ 题目与答题 ============ */
+var QUESTIONS=[
+/* ===== A 图形推理（瑞文式矩阵）===== */
+{ dim:'A', q:'补全矩阵：每行保持相同的形状', extra:'观察每行图形遵循的规律，选出缺失的一块。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4'}]},{shapes:[{t:'c',c:'#3b6fd4'}]},{shapes:[{t:'c',c:'#3b6fd4'}]},
+         {shapes:[{t:'s',c:'#c0392b'}]},{shapes:[{t:'s',c:'#c0392b'}]},{shapes:[{t:'s',c:'#c0392b'}]},
+         {shapes:[{t:'t',c:'#c9a227'}]},{shapes:[{t:'t',c:'#c9a227'}]},null],
+  opts:[{shapes:[{t:'t',c:'#c9a227'}]},{shapes:[{t:'c',c:'#3b6fd4'}]},{shapes:[{t:'s',c:'#c0392b'}]},{shapes:[{t:'t',c:'#3b6fd4'}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：每列图形的数量递增', extra:'数量沿着列的方向依次增加。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'c',c:'#3b6fd4',n:2}]},{shapes:[{t:'c',c:'#3b6fd4',n:3}]},
+         {shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'c',c:'#3b6fd4',n:2}]},{shapes:[{t:'c',c:'#3b6fd4',n:3}]},
+         {shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'c',c:'#3b6fd4',n:2}]},null],
+  opts:[{shapes:[{t:'c',c:'#3b6fd4',n:3}]},{shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'c',c:'#3b6fd4',n:2}]},{shapes:[{t:'c',c:'#3b6fd4',n:4}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：外层与内层图形分别变化', extra:'外层的形状逐行变化，内层的形状也逐行变化。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'s',c:'#c9a227',size:.35}]},{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'s',c:'#c9a227',size:.35}]},{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'s',c:'#c9a227',size:.35}]},
+         {shapes:[{t:'s',c:'#c0392b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},{shapes:[{t:'s',c:'#c0392b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},{shapes:[{t:'s',c:'#c0392b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},
+         {shapes:[{t:'t',c:'#2c7a7b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},{shapes:[{t:'t',c:'#2c7a7b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},null],
+  opts:[{shapes:[{t:'t',c:'#2c7a7b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'s',c:'#c9a227',size:.35}]},{shapes:[{t:'s',c:'#c0392b',size:.7},{t:'c',c:'#3b6fd4',size:.35}]},{shapes:[{t:'t',c:'#2c7a7b',size:.7},{t:'s',c:'#c9a227',size:.35}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：行决定形状，列决定颜色', extra:'同一行的图形形状相同，同一列的图形颜色相同。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4'}]},{shapes:[{t:'c',c:'#c0392b'}]},{shapes:[{t:'c',c:'#c9a227'}]},
+         {shapes:[{t:'s',c:'#3b6fd4'}]},{shapes:[{t:'s',c:'#c0392b'}]},{shapes:[{t:'s',c:'#c9a227'}]},
+         {shapes:[{t:'t',c:'#3b6fd4'}]},{shapes:[{t:'t',c:'#c0392b'}]},null],
+  opts:[{shapes:[{t:'t',c:'#c9a227'}]},{shapes:[{t:'t',c:'#3b6fd4'}]},{shapes:[{t:'c',c:'#c9a227'}]},{shapes:[{t:'s',c:'#c9a227'}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：三角形按规律旋转', extra:'每个格子里的三角形方向沿矩阵逐步旋转。',
+  cells:[{shapes:[{t:'t',c:'#3b6fd4',r:0}]},{shapes:[{t:'t',c:'#3b6fd4',r:90}]},{shapes:[{t:'t',c:'#3b6fd4',r:180}]},
+         {shapes:[{t:'t',c:'#3b6fd4',r:180}]},{shapes:[{t:'t',c:'#3b6fd4',r:0}]},{shapes:[{t:'t',c:'#3b6fd4',r:90}]},
+         {shapes:[{t:'t',c:'#3b6fd4',r:90}]},{shapes:[{t:'t',c:'#3b6fd4',r:180}]},null],
+  opts:[{shapes:[{t:'t',c:'#3b6fd4',r:0}]},{shapes:[{t:'t',c:'#3b6fd4',r:90}]},{shapes:[{t:'t',c:'#3b6fd4',r:180}]},{shapes:[{t:'c',c:'#3b6fd4'}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：内层图形随位置变化', extra:'外层形状随行变化，内层形状随列变化。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'s',c:'#2c7a7b',size:.35}]},{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'c',c:'#2c7a7b',size:.35}]},{shapes:[{t:'c',c:'#3b6fd4',size:.7},{t:'t',c:'#2c7a7b',size:.35}]},
+         {shapes:[{t:'s',c:'#c0392b',size:.7},{t:'s',c:'#2c7a7b',size:.35}]},{shapes:[{t:'s',c:'#c0392b',size:.7},{t:'c',c:'#2c7a7b',size:.35}]},{shapes:[{t:'s',c:'#c0392b',size:.7},{t:'t',c:'#2c7a7b',size:.35}]},
+         {shapes:[{t:'t',c:'#c9a227',size:.7},{t:'s',c:'#2c7a7b',size:.35}]},{shapes:[{t:'t',c:'#c9a227',size:.7},{t:'c',c:'#2c7a7b',size:.35}]},null],
+  opts:[{shapes:[{t:'t',c:'#c9a227',size:.7},{t:'t',c:'#2c7a7b',size:.35}]},{shapes:[{t:'t',c:'#c9a227',size:.7},{t:'s',c:'#2c7a7b',size:.35}]},{shapes:[{t:'t',c:'#c9a227',size:.7},{t:'c',c:'#2c7a7b',size:.35}]},{shapes:[{t:'s',c:'#c0392b',size:.7},{t:'t',c:'#2c7a7b',size:.35}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：颜色沿行变化，数量沿列变化', extra:'同一行的颜色相同，同一列的数量相同。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'c',c:'#3b6fd4',n:2}]},{shapes:[{t:'c',c:'#3b6fd4',n:3}]},
+         {shapes:[{t:'c',c:'#c0392b',n:1}]},{shapes:[{t:'c',c:'#c0392b',n:2}]},{shapes:[{t:'c',c:'#c0392b',n:3}]},
+         {shapes:[{t:'c',c:'#c9a227',n:1}]},{shapes:[{t:'c',c:'#c9a227',n:2}]},null],
+  opts:[{shapes:[{t:'c',c:'#c9a227',n:3}]},{shapes:[{t:'c',c:'#c9a227',n:1}]},{shapes:[{t:'c',c:'#c9a227',n:2}]},{shapes:[{t:'c',c:'#c0392b',n:3}]}], answer:0 },
+
+{ dim:'A', q:'补全矩阵：形状与数量按规律循环', extra:'每行中形状和它的数量一起向后移位。',
+  cells:[{shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'s',c:'#c0392b',n:2}]},{shapes:[{t:'t',c:'#c9a227',n:3}]},
+         {shapes:[{t:'t',c:'#c9a227',n:3}]},{shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'s',c:'#c0392b',n:2}]},
+         {shapes:[{t:'s',c:'#c0392b',n:2}]},{shapes:[{t:'t',c:'#c9a227',n:3}]},null],
+  opts:[{shapes:[{t:'c',c:'#3b6fd4',n:1}]},{shapes:[{t:'s',c:'#c0392b',n:2}]},{shapes:[{t:'t',c:'#c9a227',n:3}]},{shapes:[{t:'c',c:'#3b6fd4',n:2}]}], answer:0 },
+
+/* ===== B 数字推理 ===== */
+{ dim:'B', q:'2, 4, 8, 16, ?', extra:'找出数列的规律。', opts:[{txt:'24'},{txt:'28'},{txt:'30'},{txt:'32'}], answer:3 },
+{ dim:'B', q:'1, 1, 2, 3, 5, 8, ?', extra:'经典斐波那契数列。', opts:[{txt:'11'},{txt:'13'},{txt:'15'},{txt:'18'}], answer:1 },
+{ dim:'B', q:'3, 6, 12, 24, ?', extra:'后一项是前一项的两倍。', opts:[{txt:'36'},{txt:'44'},{txt:'48'},{txt:'52'}], answer:2 },
+{ dim:'B', q:'100, 90, 81, 73, ?', extra:'相邻差依次递减。', opts:[{txt:'64'},{txt:'65'},{txt:'66'},{txt:'67'}], answer:2 },
+{ dim:'B', q:'2, 5, 10, 17, 26, ?', extra:'相邻差为连续奇数。', opts:[{txt:'35'},{txt:'36'},{txt:'37'},{txt:'38'}], answer:2 },
+{ dim:'B', q:'1, 4, 9, 16, 25, ?', extra:'平方数序列。', opts:[{txt:'30'},{txt:'36'},{txt:'49'},{txt:'64'}], answer:1 },
+{ dim:'B', q:'64, 32, 16, 8, ?', extra:'后一项是前一项的一半。', opts:[{txt:'2'},{txt:'4'},{txt:'6'},{txt:'8'}], answer:1 },
+{ dim:'B', q:'7, 14, 9, 18, 13, 26, ?', extra:'交替“乘二”与“减五”。', opts:[{txt:'15'},{txt:'18'},{txt:'21'},{txt:'24'}], answer:2 },
+{ dim:'B', q:'2, 3, 5, 9, 17, ?', extra:'后一项约为前一项的两倍再减一。', opts:[{txt:'31'},{txt:'32'},{txt:'33'},{txt:'34'}], answer:2 },
+
+/* ===== C 语言逻辑 ===== */
+{ dim:'C', q:'狮子 之于 兽群，正如 蜜蜂 之于 ____', opts:[{txt:'蜂群'},{txt:'花粉'},{txt:'蜂蜜'},{txt:'蜂巢'}], answer:0 },
+{ dim:'C', q:'医生 之于 病人，正如 教师 之于 ____', opts:[{txt:'课本'},{txt:'学生'},{txt:'学校'},{txt:'考试'}], answer:1 },
+{ dim:'C', q:'树 之于 森林，正如 星 之于 ____', opts:[{txt:'行星'},{txt:'夜空'},{txt:'星系'},{txt:'光芒'}], answer:2 },
+{ dim:'C', q:'墨水 之于 笔，正如 颜料 之于 ____', opts:[{txt:'画布'},{txt:'画笔'},{txt:'色彩'},{txt:'画架'}], answer:1 },
+{ dim:'C', q:'炎热 之于 寒冷，正如 白天 之于 ____', opts:[{txt:'清晨'},{txt:'午夜'},{txt:'黑夜'},{txt:'傍晚'}], answer:2 },
+{ dim:'C', q:'书 之于 知识，正如 地图 之于 ____', opts:[{txt:'距离'},{txt:'方向'},{txt:'景色'},{txt:'纸张'}], answer:1 },
+{ dim:'C', q:'鱼 之于 水，正如 鸟 之于 ____', opts:[{txt:'天空'},{txt:'树枝'},{txt:'巢穴'},{txt:'羽毛'}], answer:0 },
+{ dim:'C', q:'时钟 之于 时间，正如 温度计 之于 ____', opts:[{txt:'天气'},{txt:'温度'},{txt:'湿度'},{txt:'气压'}], answer:1 },
+
+/* ===== D 空间能力 ===== */
+{ dim:'D', q:'下列哪个图形与题干图形旋转到同一姿态？', extra:'寻找旋转角度一致的图形。',
+  cells:[{shapes:[{t:'s',c:'#3b6fd4',r:45}]}],
+  opts:[{shapes:[{t:'s',c:'#3b6fd4',r:45}]},{shapes:[{t:'s',c:'#3b6fd4',r:0}]},{shapes:[{t:'s',c:'#3b6fd4',r:90}]},{shapes:[{t:'s',c:'#3b6fd4',r:135}]}], answer:0 },
+{ dim:'D', q:'以下哪个展开图折叠后能组成一个完整正方体？', opts:[{txt:'四个正方形排成一列，上下各有一个正方形',desc:'十字形'},{txt:'两个正方形上下叠放',desc:'双格'},{txt:'五个正方形连成一条直线',desc:'长条'},{txt:'两个并排，再接三个并排',desc:'梯形'}], answer:0 },
+{ dim:'D', q:'一个正方体的每个面都涂了不同颜色。从任意一个方向观察，最多能同时看到几种颜色？', opts:[{txt:'1 种'},{txt:'2 种'},{txt:'3 种'},{txt:'4 种'}], answer:2 },
+{ dim:'D', q:'图中三角形关于竖直中轴镜像后，与哪个选项相同？', extra:'镜像不会改变图形的尺寸。',
+  cells:[{shapes:[{t:'t',c:'#c0392b'}]}],
+  opts:[{shapes:[{t:'t',c:'#c0392b'}]},{shapes:[{t:'t',c:'#c0392b',r:180}]},{shapes:[{t:'c',c:'#c0392b'}]},{shapes:[{t:'s',c:'#c0392b'}]}], answer:0 },
+{ dim:'D', q:'字母「p」在镜子里（左右翻转）看起来像哪个字母？', opts:[{txt:'b'},{txt:'q'},{txt:'d'},{txt:'g'}], answer:1 },
+{ dim:'D', q:'把一张正方形纸对折两次，然后剪掉一个小角，再展开。纸上会有几个洞？', opts:[{txt:'1 个'},{txt:'2 个'},{txt:'4 个'},{txt:'8 个'}], answer:2 },
+{ dim:'D', q:'将题干图形顺时针旋转 90° 后，与哪个选项一致？', extra:'旋转不改尺寸和形状。',
+  cells:[{shapes:[{t:'s',c:'#2c7a7b',r:30}]}],
+  opts:[{shapes:[{t:'s',c:'#2c7a7b',r:120}]},{shapes:[{t:'s',c:'#2c7a7b',r:30}]},{shapes:[{t:'s',c:'#2c7a7b',r:90}]},{shapes:[{t:'s',c:'#2c7a7b',r:60}]}], answer:0 },
+{ dim:'D', q:'一个圆锥体从正上方垂直看下去，看到的是什么形状？', opts:[{txt:'圆形'},{txt:'三角形'},{txt:'正方形'},{txt:'一个点'}], answer:0 },
+
+/* ===== E 抽象逻辑 ===== */
+{ dim:'E', q:'所有玫瑰都是花；有些花会凋谢。由此必然可以推出：', opts:[{txt:'有些玫瑰会凋谢'},{txt:'所有花都是玫瑰'},{txt:'所有会凋谢的都是玫瑰'},{txt:'无法必然推出玫瑰是否会凋谢'}], answer:3 },
+{ dim:'E', q:'小明说：“我正在说谎。”如果他说的是真话，那么——', opts:[{txt:'他一定在说谎'},{txt:'他一定说真话'},{txt:'无法判断'},{txt:'他既说真话又说谎'}], answer:2 },
+{ dim:'E', q:'所有学生都会写字；有些学生是运动员。由此必然可以推出：', opts:[{txt:'所有运动员都会写字'},{txt:'有些运动员不会写字'},{txt:'所有会写字的人都是学生'},{txt:'无法推出任何结论'}], answer:0 },
+{ dim:'E', q:'如果明天下雨，活动就会取消。活动没有取消。因此：', opts:[{txt:'明天一定下雨'},{txt:'明天一定不下雨'},{txt:'明天可能下雨也可能不下雨'},{txt:'活动被推迟了'}], answer:1 },
+{ dim:'E', q:'你的目标是尽快完成任务。方案A成本最低但耗时最长，方案B耗时最短但成本最高，方案C居中。应选择：', opts:[{txt:'方案 A'},{txt:'方案 B'},{txt:'方案 C'},{txt:'无法比较'}], answer:1 },
+{ dim:'E', q:'医生 之于 诊断，正如 律师 之于 ____', opts:[{txt:'起诉'},{txt:'辩护'},{txt:'审判'},{txt:'合同'}], answer:1 },
+{ dim:'E', q:'只有通过考试，才能毕业。小张已经毕业了。因此：', opts:[{txt:'小张不一定通过了考试'},{txt:'小张一定通过了考试'},{txt:'小张可能没参加考试'},{txt:'考试对毕业不重要'}], answer:1 },
+{ dim:'E', q:'观点：猫比狗更适合做宠物，因为猫更安静。以下哪项最能削弱这一论证？', opts:[{txt:'狗比猫更忠诚'},{txt:'安静并不是选择宠物时最重要的标准'},{txt:'有些猫也很吵闹'},{txt:'狗需要更多运动'}], answer:1 },
+{ dim:'E', q:'一列火车每小时行驶 120 公里，另一列每小时行驶 80 公里。两列从同一地点同向出发，3 小时后较快的火车领先多少公里？', opts:[{txt:'40 公里'},{txt:'120 公里'},{txt:'240 公里'},{txt:'360 公里'}], answer:1 }
+];
+
+function renderQuestion(){
+  var q=QUESTIONS[CUR];
+  document.getElementById("quizDim").textContent="维度 "+q.dim+" · "+DIM_NAME[q.dim];
+  document.getElementById("quizNum").textContent=(CUR+1)+" / "+QUESTIONS.length;
+  document.getElementById("qTitle").textContent=(CUR+1)+". "+q.q;
+  document.getElementById("qExtra").textContent=q.extra||"";
+  var st=q.cells?stageSVG(q.cells):'';
+  document.getElementById("qStage").innerHTML=st;
+  var opts="";
+  q.opts.forEach(function(o,i){
+    var inner=o.shapes?cellSVG(o.shapes):('<div class="otxt">'+(o.txt||'')+'</div>'+(o.desc?'<div class="odesc">'+o.desc+'</div>':''));
+    opts+='<div class="opt" id="opt'+i+'" onclick="pick('+i+')">'+inner+'</div>';
+  });
+  document.getElementById("qOpts").innerHTML=opts;
+  /* 回填已选 */
+  if(typeof ANSWERS[CUR]!=="undefined"){
+    var sel=ANSWERS[CUR];
+    if(sel!==null) document.getElementById("opt"+sel).classList.add("sel");
+    document.getElementById("btnNext").disabled=false;
+  }else{
+    document.getElementById("btnNext").disabled=true;
+  }
+  var pct=Math.round((CUR)/QUESTIONS.length*100);
+  document.getElementById("progressBar").style.width=pct+"%";
+  document.getElementById("progressLabel").textContent="完成度 "+Math.round((CUR)/QUESTIONS.length*100)+"%";
+  document.getElementById("btnPrev").style.visibility=(CUR===0)?"hidden":"visible";
+}
+function pick(i){
+  for(var k=0;k<4;k++){var el=document.getElementById("opt"+k);if(el)el.classList.remove("sel");}
+  document.getElementById("opt"+i).classList.add("sel");
+  ANSWERS[CUR]=i; persist(); markNext();
+}
+function markNext(){document.getElementById("btnNext").disabled=false;}
+function prevQ(){ if(CUR>0){CUR--;renderQuestion();} }
+function nextQ(){
+  if(CUR<QUESTIONS.length-1){CUR++;renderQuestion();}
+  else{finish();}
+}
+function persist(){
+  try{localStorage.setItem(KEY_SAVE,JSON.stringify({answers:ANSWERS,cur:CUR}));}catch(e){}
+}
+function loadSave(){
+  try{
+    var d=JSON.parse(localStorage.getItem(KEY_SAVE));
+    if(d&&d.answers){ANSWERS=d.answers; if(d.cur) CUR=d.cur;}
+  }catch(e){}
+}
+function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("show")},2600);}
+function showView(id){
+  document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0,0);
+}
+function startQuiz(){ loadSave(); showView("view-quiz"); renderQuestion(); }
+function showModal(id){document.getElementById(id).classList.add("show");}
+function closeModal(id){document.getElementById(id).classList.remove("show");}
+</script>
+<script>
+/* ============ 计分与结果 ============ */
+/* ============ 认知画像库 ============ */
+var PROFILES={
+A:{name:"构型猎手",tag:"视觉推理 · 流体智力",quote:"在混乱中看见秩序，是你最安静的超能力。",
+  analysis:"你在抽象图形的规律识别上表现突出。这类题目测的是流体智力（fluid intelligence）——不依赖既有知识、纯粹处理新关系的能力。它被心理学家视为一般智力（g 因素）最纯粹的测量之一，也是瑞文渐进矩阵（Raven's Progressive Matrices）的核心考察对象。",
+  theory:"高流体智力者擅长从无结构的信息中抽取模式，这种能力与快速学习新系统、适应陌生环境的效率高度相关。它更多来自大脑的执行功能与工作记忆容量，而非后天知识的累积。",
+  tips:"面对新领域时，你比多数人更快建立心智模型。善用这种直觉去拆解复杂问题，但也要注意给‘灵光一现’留出结构化检验的余地。"},
+B:{name:"数字洞见者",tag:"数字推理 · 工作记忆",quote:"别人看见数列，你看见的是关系。",
+  analysis:"你在数列与运算规律上表现突出。数字推理要求同时保持多项信息、识别递进关系并预测下一项，是工作记忆容量与执行控制能力的直接体现，也常被纳入智力测验的‘量化推理’（quantitative reasoning）维度。",
+  theory:"数字敏锐度既涉及流体智力，也与个体的‘数感’（number sense）有关。研究显示，对数量关系的内在把握与解决复杂问题的策略选择紧密相关。",
+  tips:"你适合需要精确计算与多步推演的领域。把抽象的数字直觉转化为结构化的假设—验证流程，会极大放大你的优势。"},
+C:{name:"语汇织语者",tag:"语言逻辑 · 晶体智力",quote:"语言的纹路，是你理解世界的方式。",
+  analysis:"你在语义类比与词汇关系上表现突出。这类题目测的是晶体智力（crystallized intelligence）——经由教育、阅读与经验长期积累形成的知识结构与语义网络。",
+  theory:"晶体智力随年龄增长而持续上升，反映一个人调用既有知识进行抽象归类与联想的能力。它与语言理解的深度、表达的精确度密切相关，是许多高层次认知任务的基础。",
+  tips:"你的知识联结能力是宝贵资产。持续跨领域的阅读能不断为你的‘语义网络’添加新节点，让你在新旧知识之间快速架桥。"},
+D:{name:"空间构型师",tag:"空间能力 · 心理旋转",quote:"你的脑海里，有整个三维世界。",
+  analysis:"你在旋转、镜像与空间推理上表现突出。空间能力（spatial ability）涵盖心理旋转、空间可视化与空间定向，是智力的一个重要独立维度，在工程、设计与科学领域预测力尤为显著。",
+  theory:"空间能力与大脑顶叶区域的处理效率相关。研究表明，空间推理不仅可通过训练提升，还与创造性问题解决、数学成就存在显著正相关。",
+  tips:"你擅长在脑中‘转动’对象、预判空间结果。建筑设计、产品、工程、手术规划等高度依赖空间直觉的领域，可能特别适合你发挥所长。"},
+E:{name:"逻辑猎手",tag:"抽象逻辑 · 演绎推理",quote:"每一步推论，你都先看清前提。",
+  analysis:"你在条件推理、三段论与逻辑判断上表现突出。这类题目考察演绎推理能力——从既定前提出发，严格推导必然结论，是对逻辑严密性的直接检验。",
+  theory:"演绎推理依赖对‘充分’与‘必要’条件的精确区分，是批判性思维与科学论证能力的基石。它与决策质量、风险评估的稳健性显著相关。",
+  tips:"你擅于识别论证中的漏洞与隐含前提。在团队中，你往往是那个‘帮大家把话说清楚、把逻辑理顺’的人——请珍惜并善用这种严谨。"}
+};
+
+/* ============ 计分与结果 ============ */
+function iqBand(iq){
+  if(iq>=130)return["130+","非常优秀 · Gifted"];
+  if(iq>=120)return["120–129","优秀 · Superior"];
+  if(iq>=110)return["110–119","中上 · High Average"];
+  if(iq>=90)return["90–109","中等 · Average"];
+  if(iq>=80)return["80–89","中下 · Low Average"];
+  if(iq>=70)return["70–79","边界 · Borderline"];
+  return["<70","参考范围偏低"];
+}
+function finish(){
+  var dimScore={A:0,B:0,C:0,D:0,E:0};
+  var dimTotal={A:8,B:9,C:8,D:8,E:9};
+  var total=0;
+  QUESTIONS.forEach(function(q,i){
+    if(ANSWERS[i]===q.answer){dimScore[q.dim]++;total++;}
+  });
+  var iq=Math.round(100+(total-21)*2.4);
+  iq=Math.max(50,Math.min(150,iq));
+  var best="A",bestv=-1;
+  DIMS.forEach(function(d){ if(dimScore[d]>bestv){bestv=dimScore[d];best=d;} });
+  var profile=PROFILES[best];
+  var band=iqBand(iq); _iq=iq; _total=total;
+  var dimsHtml="";
+  DIMS.forEach(function(d){
+    var pct=Math.round(dimScore[d]/dimTotal[d]*100);
+    dimsHtml+='<div class="r-dim"><b>'+DIM_NAME[d]+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><span>'+dimScore[d]+' / '+dimTotal[d]+'</span></div>';
+  });
+  document.getElementById("resultRoot").innerHTML=
+    '<div class="r-head"><div class="tag">IQ 2027 · 综合认知测评</div>'+
+      '<h2>'+profile.name+'</h2>'+
+      '<div class="iqline">'+profile.tag+'</div>'+
+      '<div class="r-iq"><div class="iq-big">'+iq+'</div>'+
+      '<div class="iq-band"><b>IQ '+band[0]+'</b><span>'+band[1]+' · 常模均值 100，标准差 15</span></div></div>'+
+      '<div class="r-share">'+
+        '<button class="btn" onclick="saveImage()">保存结果长图</button>'+
+        '<button class="btn btn-ghost" onclick="copyResult()">复制结果链接</button>'+
+        '<button class="btn btn-ghost" onclick="retake()">重新测评</button>'+
+      '</div></div>'+
+    '<div class="r-block"><h3><span class="ico">◈</span>你的认知画像</h3><p class="tagline">“'+profile.quote+'”</p><p>'+profile.analysis+'</p></div>'+
+    '<div class="r-block"><h3><span class="ico">▤</span>维度分析</h3><p>五大认知维度的作答表现（正确题数 / 总题数）：</p><div class="r-dims">'+dimsHtml+'</div></div>'+
+    '<div class="r-block"><h3><span class="ico">§</span>测评背后的理论</h3><ul class="bullets"><li><b>g 因素</b>：所有智力测验共享的‘一般智力’，体现为跨领域一致的表现水平。</li><li><b>流体智力 vs 晶体智力</b>：前者处理新问题、后者调用积累知识，两者随年龄变化的方向不同。</li><li><b>多维模型（CHC）</b>：现代测量将智力拆分为流体推理、晶体知识、空间、数量、阅读等层级能力，本测试覆盖其中五类。</li></ul><p>'+profile.theory+'</p><p class="cite"><b>建议</b>：'+profile.tips+'</p></div>'+
+    '<div class="r-block"><h3><span class="ico">i</span>阅读结果</h3><p>IQ 分数依据 42 题答对数，按正态常模（均值 100、标准差 15）折算，用于相对定位，非绝对评价。认知画像反映你相对最强的维度，不代表其他维度薄弱。本测评仅供参考，不构成专业心理评估或诊断。</p></div>'+
+    '<div class="retake"><button class="btn" onclick="retake()">再做一次</button></div>';
+  showView("view-result");
+}
+function saveImage(){
+  var el=document.getElementById("resultRoot");
+  toast("正在生成结果长图…");
+  html2canvas(el,{scale:2,backgroundColor:"#f4f6f9",useCORS:true}).then(function(canvas){
+    var a=document.createElement("a");
+    a.download="IQ2027-结果.png";
+    a.href=canvas.toDataURL("image/png");
+    a.click();
+    toast("长图已保存");
+  }).catch(function(){toast("生成失败，请重试");});
+}
+function copyResult(){
+  var url=location.href.split("?")[0]+"?iq="+_iq+"&t="+_total;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url);}
+  else{var ta=document.createElement("textarea");ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}
+  toast("结果链接已复制");
+}
+function retake(){
+  try{localStorage.removeItem(KEY_SAVE);}catch(e){}
+  ANSWERS=[];CUR=0;
+  showView("view-intro");
+  toast("已清空，欢迎重新测评");
+}
+/*__QUESTIONS_MORE__*/
+</script>
+</body>
+</html>
