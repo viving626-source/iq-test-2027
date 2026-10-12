@@ -139,6 +139,27 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ===== 支付弹窗 ===== */
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.pay-method{border:1.5px solid var(--line);border-radius:10px;padding:10px 4px;text-align:center;font-size:12px;background:#fff;transition:border-color .15s}
+.pay-method b{display:block;font-size:13px;color:var(--ink);margin-bottom:2px}
+.pay-method span{color:var(--muted)}
+.pay-method.sel{border-color:var(--gold);background:#fdf9ec}
+.pay-info{background:#f5f6f8;border-radius:10px;padding:12px 14px;font-size:13px;color:#44546a;margin-bottom:10px}
+.pay-info .pi-row{display:flex;justify-content:space-between;gap:12px;margin:4px 0}
+.pay-info .pi-row b{color:var(--ink);flex:none}
+.pay-info img{width:150px;height:150px;object-fit:contain;display:block;margin:8px auto;background:#fff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.pay-txn{margin:12px 0}
+.pay-txn label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.pay-txn input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
+.pay-txn input:focus{outline:none;border-color:var(--gold)}
+.pay-note{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.6}
+.unlock-blur{filter:blur(6px);pointer-events:none;user-select:none}
+.unlock-gate{text-align:center;padding:26px 16px;background:linear-gradient(180deg,#fbfcfe,#f2f4f8);border:1px dashed var(--gold);border-radius:14px;margin:16px 0}
+.unlock-gate b{display:block;font-size:16px;color:var(--ink);margin-bottom:6px}
+.unlock-gate p{font-size:13px;color:var(--muted);margin-bottom:14px}
+@media(max-width:560px){.pay-methods{grid-template-columns:1fr;gap:6px}}
+
 /* ===== 响应式 ===== */
 @media (max-width:560px){
   .opts{grid-template-columns:1fr}
@@ -216,6 +237,23 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="result" id="resultRoot"></div>
 </section>
 
+<!-- ===== 模态：支付解锁 ===== -->
+<div class="modal-mask" id="modal-pay">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal('modal-pay')">×</button>
+    <h3>解锁完整测评报告</h3>
+    <p class="m-sub">一次解锁，永久开放你的完整认知分析</p>
+    <div class="pay-methods" id="payMethods"></div>
+    <div class="pay-info" id="payInfo"></div>
+    <div class="pay-txn">
+      <label>付款交易编号</label>
+      <input id="payTxn" type="text" placeholder="付款后填写的交易编号（必填）">
+    </div>
+    <button id="paySubmit" class="btn btn-block" onclick="submitOrder()">我已付款 · 立即解锁</button>
+    <p class="pay-note">提交后<b>即时自动解锁</b>完整报告，无需等待。请保留交易记录以备核验。<b>同一设备只需解锁一次</b>，换设备可用同一密码找回。</p>
+  </div>
+</div>
+
 <!-- ===== 模态：了解测评 ===== -->
 <div class="modal-mask" id="modal-how">
   <div class="modal">
@@ -239,7 +277,25 @@ var DIM_NAME={A:"图形推理",B:"数字推理",C:"语言逻辑",D:"空间能力
 var CUR=0, ANSWERS=[];
 var KEY_SAVE="iq2027_answers";
 
-var PAY={price:9.9,currency:"MOP/HKD"};
+/* ============ 设备标识（解锁记忆） ============ */
+var DEVICE_ID=(function(){try{var d=localStorage.getItem("iq_device_id");if(!d){d="iq-"+(Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,5));localStorage.setItem("iq_device_id",d);}return d;}catch(e){return "iq-"+Date.now();}})();
+var UNLOCK_CACHE={};
+
+/* ============ 收款配置 ============ */
+var PAY={price:9.9,currency:"MOP",methods:[
+  {id:"mpay",name:"MPay（澳门）",desc:"手机号转账，即时到账",account:"+853 66752916",
+   steps:["打开 MPay，按手机号 +853 66752916 转账","输入 9.9 澳门元，备注「IQ2027」","付款后把交易编号填到下方输入框"]},
+  {id:"wechat",name:"微信支付",desc:"扫码付款，快捷方便",account:"微信收款码",qrImage:"assets/pay-wechat.jpg",
+   steps:["长按 / 微信扫码识别下方收款码付款 9.9 元","付款后把交易编号填到下方输入框"]},
+  {id:"alipay",name:"支付宝",desc:"扫码付款，快捷方便",account:"支付宝收款码",qrImage:"assets/pay-alipay.jpg",
+   steps:["打开支付宝扫一扫，识别下方收款码付款 9.9 元","付款后把交易编号填到下方输入框"]}
+]};
+
+/* ============ Supabase：旧项目（记录测评结果） ============ */
+var SUP_OLD={url:"https://qczgmhtfxswgcnoncqja.supabase.co",key:"sb_publishable_RQ-ETJViWOolwRybH6pKXg_81bPbKpD"};
+/* ============ Supabase：新项目（付费订单 / 解锁）—— 待用户提供 URL 与 anon key ============ */
+var SUP_NEW={url:"",key:""};
+function sbHeaders(sup){return {"apikey":sup.key,"Authorization":"Bearer "+sup.key,"Content-Type":"application/json","Prefer":"return=minimal"};}
 </script>
 <script>
 /* ============ SVG 图形渲染 ============ */
@@ -476,41 +532,127 @@ function iqBand(iq){
   if(iq>=70)return["70–79","边界 · Borderline"];
   return["<70","参考范围偏低"];
 }
+var _iq=0,_total=0,_dims={A:0,B:0,C:0,D:0,E:0},_profile=null;
+var DIM_TOTAL={A:8,B:9,C:8,D:8,E:9};
 function finish(){
-  var dimScore={A:0,B:0,C:0,D:0,E:0};
-  var dimTotal={A:8,B:9,C:8,D:8,E:9};
-  var total=0;
+  _dims={A:0,B:0,C:0,D:0,E:0}; var total=0;
   QUESTIONS.forEach(function(q,i){
-    if(ANSWERS[i]===q.answer){dimScore[q.dim]++;total++;}
+    if(ANSWERS[i]===q.answer){_dims[q.dim]++;total++;}
   });
-  var iq=Math.round(100+(total-21)*2.4);
-  iq=Math.max(50,Math.min(150,iq));
+  _iq=Math.round(100+(total-21)*2.4);
+  _iq=Math.max(50,Math.min(150,_iq)); _total=total;
   var best="A",bestv=-1;
-  DIMS.forEach(function(d){ if(dimScore[d]>bestv){bestv=dimScore[d];best=d;} });
-  var profile=PROFILES[best];
-  var band=iqBand(iq); _iq=iq; _total=total;
+  DIMS.forEach(function(d){ if(_dims[d]>bestv){bestv=_dims[d];best=d;} });
+  _profile=PROFILES[best];
+  recordResult();
+  checkUnlock(function(unlocked){ renderResult(unlocked); });
+  showView("view-result");
+}
+/* 记录测评结果到旧 Supabase（异步，不影响答题） */
+function recordResult(){
+  if(!SUP_OLD.url)return;
+  try{
+    fetch(SUP_OLD.url+"/rest/v1/rpc/record_iq",{method:"POST",headers:sbHeaders(SUP_OLD),body:JSON.stringify({
+      p_device_id:DEVICE_ID,p_iq:_iq,p_total:_total,
+      p_dim_a:_dims.A,p_dim_b:_dims.B,p_dim_c:_dims.C,p_dim_d:_dims.D,p_dim_e:_dims.E,
+      p_profile:_profile.name})}).catch(function(){});
+  }catch(e){}
+}
+/* 查询新 Supabase 是否已付费解锁（无配置时回退本地记忆） */
+function checkUnlock(cb){
+  var unlocked=!!(UNLOCK_CACHE[_profile.name]||(function(){try{return localStorage.getItem("iq_unlocked_"+_profile.name)==="1";}catch(e){return false;}})());
+  if(!SUP_NEW.url){cb(unlocked);return;}
+  fetch(SUP_NEW.url+"/rest/v1/rpc/get_unlocks",{method:"POST",headers:sbHeaders(SUP_NEW),body:JSON.stringify({p_device_id:DEVICE_ID})})
+    .then(function(r){return r.json();})
+    .then(function(rows){
+      if(Array.isArray(rows))rows.forEach(function(rr){if(rr&&rr.type){UNLOCK_CACHE[rr.type]=true;try{localStorage.setItem("iq_unlocked_"+rr.type,"1");}catch(e){}}});
+      var now=!!(UNLOCK_CACHE[_profile.name]||(function(){try{return localStorage.getItem("iq_unlocked_"+_profile.name)==="1";}catch(e){return false;}})());
+      cb(now);
+    }).catch(function(){cb(unlocked);});
+}
+function renderResult(unlocked){
+  var profile=_profile, band=iqBand(_iq);
   var dimsHtml="";
   DIMS.forEach(function(d){
-    var pct=Math.round(dimScore[d]/dimTotal[d]*100);
-    dimsHtml+='<div class="r-dim"><b>'+DIM_NAME[d]+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><span>'+dimScore[d]+' / '+dimTotal[d]+'</span></div>';
+    var pct=Math.round(_dims[d]/DIM_TOTAL[d]*100);
+    dimsHtml+='<div class="r-dim"><b>'+DIM_NAME[d]+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><span>'+_dims[d]+' / '+DIM_TOTAL[d]+'</span></div>';
   });
-  document.getElementById("resultRoot").innerHTML=
-    '<div class="r-head"><div class="tag">IQ 2027 · 综合认知测评</div>'+
+  var head='<div class="r-head"><div class="tag">IQ 2027 · 综合认知测评</div>'+
       '<h2>'+profile.name+'</h2>'+
       '<div class="iqline">'+profile.tag+'</div>'+
-      '<div class="r-iq"><div class="iq-big">'+iq+'</div>'+
+      '<div class="r-iq"><div class="iq-big">'+_iq+'</div>'+
       '<div class="iq-band"><b>IQ '+band[0]+'</b><span>'+band[1]+' · 常模均值 100，标准差 15</span></div></div>'+
       '<div class="r-share">'+
         '<button class="btn" onclick="saveImage()">保存结果长图</button>'+
         '<button class="btn btn-ghost" onclick="copyResult()">复制结果链接</button>'+
         '<button class="btn btn-ghost" onclick="retake()">重新测评</button>'+
-      '</div></div>'+
-    '<div class="r-block"><h3><span class="ico">◈</span>你的认知画像</h3><p class="tagline">“'+profile.quote+'”</p><p>'+profile.analysis+'</p></div>'+
+      '</div></div>';
+  var analysisBlock=unlocked
+    ? '<div class="r-block"><h3><span class="ico">◈</span>你的认知画像</h3><p class="tagline">“'+profile.quote+'”</p><p>'+profile.analysis+'</p></div>'
+    : '<div class="r-block"><h3><span class="ico">◈</span>你的认知画像</h3><p class="tagline">“'+profile.quote+'”</p><div class="unlock-blur"><p>'+profile.analysis+'</p></div></div>';
+  var theoryBlock=unlocked
+    ? '<div class="r-block"><h3><span class="ico">§</span>测评背后的理论</h3><ul class="bullets"><li><b>g 因素</b>：所有智力测验共享的‘一般智力’，体现为跨领域一致的表现水平。</li><li><b>流体智力 vs 晶体智力</b>：前者处理新问题、后者调用积累知识，两者随年龄变化的方向不同。</li><li><b>多维模型（CHC）</b>：现代测量将智力拆分为流体推理、晶体知识、空间、数量、阅读等层级能力，本测试覆盖其中五类。</li></ul><p>'+profile.theory+'</p></div>'
+    + '<div class="r-block"><h3><span class="ico">↗</span>提升建议</h3><p>'+profile.tips+'</p></div>'
+    : '<div class="unlock-gate"><b>完整报告已锁定</b><p>解锁可查看「'+profile.name+'」的心理学理论依据、隐藏认知盲区与提升建议，并导出完整长图。</p><button class="btn" onclick="openPay()">解锁完整报告 · '+PAY.price+' '+PAY.currency+'</button></div>';
+  var readBlock='<div class="r-block"><h3><span class="ico">i</span>阅读结果</h3><p>IQ 分数依据 42 题答对数，按正态常模（均值 100、标准差 15）折算，用于相对定位，非绝对评价。认知画像反映你相对最强的维度，不代表其他维度薄弱。本测评仅供参考，不构成专业心理评估或诊断。</p></div>';
+  document.getElementById("resultRoot").innerHTML=
+    head+
+    analysisBlock+
     '<div class="r-block"><h3><span class="ico">▤</span>维度分析</h3><p>五大认知维度的作答表现（正确题数 / 总题数）：</p><div class="r-dims">'+dimsHtml+'</div></div>'+
-    '<div class="r-block"><h3><span class="ico">§</span>测评背后的理论</h3><ul class="bullets"><li><b>g 因素</b>：所有智力测验共享的‘一般智力’，体现为跨领域一致的表现水平。</li><li><b>流体智力 vs 晶体智力</b>：前者处理新问题、后者调用积累知识，两者随年龄变化的方向不同。</li><li><b>多维模型（CHC）</b>：现代测量将智力拆分为流体推理、晶体知识、空间、数量、阅读等层级能力，本测试覆盖其中五类。</li></ul><p>'+profile.theory+'</p><p class="cite"><b>建议</b>：'+profile.tips+'</p></div>'+
-    '<div class="r-block"><h3><span class="ico">i</span>阅读结果</h3><p>IQ 分数依据 42 题答对数，按正态常模（均值 100、标准差 15）折算，用于相对定位，非绝对评价。认知画像反映你相对最强的维度，不代表其他维度薄弱。本测评仅供参考，不构成专业心理评估或诊断。</p></div>'+
+    theoryBlock+
+    readBlock+
     '<div class="retake"><button class="btn" onclick="retake()">再做一次</button></div>';
   showView("view-result");
+}
+/* ===== 支付解锁 ===== */
+var selectedMethod=null;
+function openPay(){
+  if(!SUP_NEW.url){toast("支付通道即将开放，请稍后重试");return;}
+  document.getElementById("payTxn").value="";
+  showModal("modal-pay");
+  renderPayMethods();
+  selectedMethod=PAY.methods[0];
+  selectMethod(0);
+}
+function renderPayMethods(){
+  var html="";
+  PAY.methods.forEach(function(m,i){html+='<div class="pay-method" id="pm'+i+'" onclick="selectMethod('+i+')"><b>'+m.name+'</b><span>'+m.desc+'</span></div>';});
+  document.getElementById("payMethods").innerHTML=html;
+}
+function selectMethod(i){
+  selectedMethod=PAY.methods[i];
+  for(var k=0;k<PAY.methods.length;k++){var el=document.getElementById("pm"+k);if(el)el.classList.remove("sel");}
+  document.getElementById("pm"+i).classList.add("sel");
+  renderPayInfo();
+}
+function renderPayInfo(){
+  var m=selectedMethod, info=document.getElementById("payInfo");
+  var qr=m.qrImage?'<img src="'+m.qrImage+'" alt="收款码">':'';
+  info.innerHTML=qr+
+    '<div class="pi-row"><b>收款方式</b><span>'+m.name+'</span></div>'+
+    '<div class="pi-row"><b>收款账号 / 码</b><span>'+m.account+'</span></div>'+
+    '<div class="pi-row"><b>应付金额</b><span>'+PAY.price+' '+PAY.currency+'</span></div>'+
+    '<div class="pi-row"><b>付款步骤</b><span style="text-align:right">'+m.steps.join("<br>")+'</span></div>';
+}
+function submitOrder(){
+  if(!SUP_NEW.url){toast("支付通道尚未配置，请稍后");return;}
+  var txn=document.getElementById("payTxn").value.trim();
+  if(!txn){toast("请填写付款后的交易编号");return;}
+  var orderNo="iq-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6);
+  var btn=document.getElementById("paySubmit");
+  btn.disabled=true; btn.textContent="正在解锁…";
+  fetch(SUP_NEW.url+"/rest/v1/rpc/submit_order",{method:"POST",headers:sbHeaders(SUP_NEW),body:JSON.stringify({
+    p_order_no:orderNo,p_device_id:DEVICE_ID,p_pwd:"",p_type:_profile.name,p_method:selectedMethod.id,p_amount:PAY.price,p_currency:PAY.currency,p_txn_id:txn})})
+    .then(function(r){return r.json();})
+    .then(function(){unlockNow();})
+    .catch(function(){toast("提交失败，请稍后重试");btn.disabled=false;btn.textContent="我已付款 · 立即解锁";});
+}
+function unlockNow(){
+  UNLOCK_CACHE[_profile.name]=true;
+  try{localStorage.setItem("iq_unlocked_"+_profile.name,"1");}catch(e){}
+  closeModal("modal-pay");
+  renderResult(true);
+  toast("完整报告已解锁");
 }
 function saveImage(){
   var el=document.getElementById("resultRoot");
