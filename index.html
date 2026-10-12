@@ -276,7 +276,7 @@ function stageSVG(cells, cell){
   var sz=cell||46, n=Math.round(Math.sqrt(cells.length));
   var svg='<div class="stage" style="grid-template-columns:repeat('+n+',auto)">';
   cells.forEach(function(sh){
-    svg+='<div style="padding:3px">'+(sh?cellSVG(sh,sz):'<div style="width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:#b9c3d2;font-weight:600">?</div>')+'</div>';
+    svg+='<div style="padding:3px">'+(sh?cellSVG(sh.shapes,sz):'<div style="width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:#b9c3d2;font-weight:600">?</div>')+'</div>';
   });
   svg+='</div>';
   return svg;
